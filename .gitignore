@@ -1,0 +1,18 @@
+# Build artifacts
+**/bin/
+**/obj/
+
+# IDE
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+
+# Test output
+TestResults/
+
+# Logs and temp
+*.log
+*.tmp
+*.cache

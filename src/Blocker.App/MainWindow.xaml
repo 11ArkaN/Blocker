@@ -1,0 +1,134 @@
+<Window x:Class="Blocker.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Blocker"
+        Width="820"
+        Height="620"
+        MinWidth="700"
+        MinHeight="520"
+        WindowStartupLocation="CenterScreen"
+        Background="#0C111C"
+        Foreground="#E6EBF5">
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Padding="16"
+                CornerRadius="10"
+                Background="#141E30"
+                BorderBrush="#2B3E62"
+                BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Blocking status"
+                               FontSize="18"
+                               FontWeight="SemiBold" />
+                    <TextBlock Margin="0,8,0,0"
+                               FontSize="15"
+                               Text="{Binding StatusText}" />
+                    <TextBlock Margin="0,4,0,0"
+                               FontSize="13"
+                               Foreground="#A9B6CF"
+                               Text="{Binding ActiveSinceText}" />
+                    <TextBlock Margin="0,4,0,0"
+                               FontSize="13"
+                               Foreground="#A9B6CF"
+                               Text="{Binding FocusLockText}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                    <TextBlock HorizontalAlignment="Right"
+                               Foreground="#A9B6CF"
+                               Text="Admin rights" />
+                    <TextBlock HorizontalAlignment="Right"
+                               Margin="0,4,0,0"
+                               FontWeight="SemiBold"
+                               Text="{Binding AdminStatus}" />
+                    <TextBlock HorizontalAlignment="Right"
+                               Margin="0,10,0,0"
+                               Foreground="#A9B6CF"
+                               Text="Guardian" />
+                    <TextBlock HorizontalAlignment="Right"
+                               Margin="0,4,0,0"
+                               FontWeight="SemiBold"
+                               Text="{Binding GuardianStatus}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="1"
+                    Margin="0,16,0,16"
+                    HorizontalAlignment="Center">
+            <Button Width="360"
+                    Height="84"
+                    Command="{Binding ToggleBlockCommand}"
+                    FontSize="24"
+                    FontWeight="Bold"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Content="{Binding ToggleButtonText}">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#179A57" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="Opacity" Value="1" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsBlockActive}" Value="True">
+                                <Setter Property="Background" Value="#C44646" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                                <Setter Property="IsEnabled" Value="False" />
+                                <Setter Property="Opacity" Value="0.75" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+
+        <Border Grid.Row="2"
+                Padding="12"
+                CornerRadius="10"
+                BorderThickness="1"
+                BorderBrush="#2B3E62"
+                Background="#101826">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <DockPanel Grid.Row="0"
+                           Margin="0,0,0,10">
+                    <TextBlock DockPanel.Dock="Left"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Text="Activity log" />
+                    <Button DockPanel.Dock="Right"
+                            Width="96"
+                            Height="30"
+                            Command="{Binding RefreshCommand}"
+                            Content="Refresh" />
+                </DockPanel>
+
+                <ListBox Grid.Row="1"
+                         Background="#0B111A"
+                         BorderThickness="1"
+                         BorderBrush="#25324A"
+                         ItemsSource="{Binding ActivityLog}"
+                         FontFamily="Consolas"
+                         FontSize="13" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

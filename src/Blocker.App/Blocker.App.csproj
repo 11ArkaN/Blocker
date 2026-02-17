@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Blocker.Guardian\Blocker.Guardian.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Target Name="CopyGuardianBinary" AfterTargets="Build">
+    <ItemGroup>
+      <GuardianFiles Include="..\Blocker.Guardian\bin\$(Configuration)\net9.0\Blocker.Guardian.exe" />
+      <GuardianFiles Include="..\Blocker.Guardian\bin\$(Configuration)\net9.0\Blocker.Guardian.pdb" Condition="Exists('..\Blocker.Guardian\bin\$(Configuration)\net9.0\Blocker.Guardian.pdb')" />
+      <GuardianFiles Include="..\Blocker.Guardian\bin\$(Configuration)\net9.0\Blocker.Guardian.deps.json" Condition="Exists('..\Blocker.Guardian\bin\$(Configuration)\net9.0\Blocker.Guardian.deps.json')" />
+      <GuardianFiles Include="..\Blocker.Guardian\bin\$(Configuration)\net9.0\Blocker.Guardian.runtimeconfig.json" Condition="Exists('..\Blocker.Guardian\bin\$(Configuration)\net9.0\Blocker.Guardian.runtimeconfig.json')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(GuardianFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>
