@@ -19,6 +19,7 @@ public partial class App : System.Windows.Application
     private MainWindow? _mainWindow;
     private TrayService? _trayService;
     private bool _isShuttingDown;
+    private int _shutdownServicesStarted;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -48,7 +49,7 @@ public partial class App : System.Windows.Application
 
         try
         {
-            ShutdownServicesAsync().GetAwaiter().GetResult();
+            Task.Run(ShutdownServicesAsync).GetAwaiter().GetResult();
         }
         finally
         {
@@ -193,13 +194,26 @@ public partial class App : System.Windows.Application
         _mainWindow.WindowState = WindowState.Normal;
         _mainWindow.Activate();
     }
-
-    private void RequestShutdown()
+    private async void RequestShutdown()
     {
-        if (_viewModel?.IsBlockActive == true)
+        var isBlockActive = _viewModel?.IsBlockActive == true;
+        if (_orchestrator is not null)
+        {
+            try
+            {
+                var state = await _orchestrator.GetStateAsync();
+                isBlockActive = state.IsActive;
+            }
+            catch (Exception ex)
+            {
+                _logger?.Error("Failed to read block state during shutdown request.", ex);
+            }
+        }
+
+        if (isBlockActive)
         {
             System.Windows.MessageBox.Show(
-                "Najpierw wyłącz blokadę, aby zamknąć aplikację.",
+                "Najpierw wylacz blokade, aby zamknac aplikacje.",
                 "Blocker",
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Warning);
@@ -212,20 +226,27 @@ public partial class App : System.Windows.Application
             _mainWindow.Close();
         }
 
+        if (_trayService is not null)
+        {
+            _trayService.Dispose();
+            _trayService = null;
+        }
+
         Shutdown();
     }
 
     private async Task ShutdownServicesAsync()
     {
+        if (Interlocked.Exchange(ref _shutdownServicesStarted, 1) == 1)
+        {
+            return;
+        }
+
         if (_orchestrator is not null)
         {
+            // Always execute full teardown to avoid leaving guardian/watchdog processes alive.
+            await _orchestrator.DisableAsync(bypassFocusLock: true);
             var current = await _orchestrator.GetStateAsync();
-            if (current.IsActive)
-            {
-                await _orchestrator.DisableAsync(bypassFocusLock: true);
-            }
-
-            current = await _orchestrator.GetStateAsync();
             if (_stateStore is not null)
             {
                 var isClean = !current.IsActive;
@@ -234,12 +255,13 @@ public partial class App : System.Windows.Application
                     current.ActivatedAt,
                     current.FocusLockUntil,
                     current.UnlockPhrase,
-                    current.IsActive,
+                    false,
                     isClean);
             }
         }
 
         _trayService?.Dispose();
+        _trayService = null;
         if (_watchdog is IDisposable disposableWatchdog)
         {
             disposableWatchdog.Dispose();
@@ -314,3 +336,4 @@ public partial class App : System.Windows.Application
         }
     }
 }
+

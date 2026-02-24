@@ -22,7 +22,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     protected override void OnClosing(CancelEventArgs e)
     {
-        if (!AllowClose || ViewModel.IsBlockActive)
+        if (!AllowClose)
         {
             e.Cancel = true;
             Hide();

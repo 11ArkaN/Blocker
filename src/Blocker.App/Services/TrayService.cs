@@ -99,12 +99,15 @@ public sealed class TrayService : IDisposable
         var item = new Forms.ToolStripMenuItem(text)
         {
             AutoSize = false,
+            Size = new Size(220, 34),
             Height = 34,
-            Padding = new Padding(12, 0, 12, 0),
-            Margin = new Padding(2),
+            Padding = new Padding(8, 0, 8, 0),
+            Margin = new Padding(1),
             TextAlign = ContentAlignment.MiddleLeft,
             Image = icon,
-            ImageScaling = Forms.ToolStripItemImageScaling.None
+            ImageScaling = Forms.ToolStripItemImageScaling.None,
+            ImageAlign = ContentAlignment.MiddleLeft,
+            TextImageRelation = Forms.TextImageRelation.ImageBeforeText
         };
         item.Click += onClick;
         return item;

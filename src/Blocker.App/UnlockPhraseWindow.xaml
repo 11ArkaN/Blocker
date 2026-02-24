@@ -5,7 +5,7 @@
                  Title="Potwierdzenie"
                  Width="560"
                  Height="420"
-                 MinWidth="360"
+                 MinWidth="340"
                  MinHeight="300"
                  ResizeMode="CanResizeWithGrip"
                  WindowStartupLocation="CenterOwner"
@@ -48,75 +48,104 @@
                          Title="Potwierdzenie Focus Lock"
                          Margin="8,8,8,0" />
 
-            <ScrollViewer Grid.Row="1"
-                          Margin="20,14,20,20"
-                          HorizontalScrollBarVisibility="Disabled"
-                          VerticalScrollBarVisibility="Auto"
-                          CanContentScroll="False">
-                <ui:CardControl x:Name="DialogCard"
-                                Header="Wpisz fraze potwierdzajaca"
-                                BorderBrush="#34507B"
-                                Background="{DynamicResource AppHeroBrush}"
-                                Padding="18">
-                    <Grid MinWidth="280">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
+            <ui:CardControl Grid.Row="1"
+                            Margin="20,14,20,20"
+                            x:Name="DialogCard"
+                            BorderBrush="#34507B"
+                            Background="{DynamicResource AppHeroBrush}"
+                            Padding="18">
+                <Grid x:Name="DialogContentGrid">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                        <ui:InfoBar Grid.Row="0"
-                                    x:Name="DialogInfoBar"
-                                    IsOpen="True"
-                                    IsClosable="False"
-                                    Severity="Warning"
-                                    Title="Wczesne zakonczenie sesji"
-                                    Message="Aby zakonczyc blokade przed uplywem 30 minut, wpisz dokladnie wymagana fraze." />
+                    <TextBlock Grid.Row="0"
+                               x:Name="DialogSectionTitleTextBlock"
+                               TextWrapping="Wrap"
+                               FontSize="22"
+                               FontWeight="SemiBold"
+                               Foreground="#F0F6FF"
+                               Text="Wpisz fraze potwierdzajaca" />
 
-                        <Border Grid.Row="1"
-                                x:Name="ReferencePhraseContainer"
-                                Margin="0,14,0,0"
-                                Padding="10,8"
-                                CornerRadius="8"
-                                BorderBrush="#2E456B"
-                                BorderThickness="1"
-                                Background="#0F1A2B">
-                            <TextBlock x:Name="ReferencePhraseTextBlock"
-                                       Text="NIC_GLUPIEGO_NIE_ZROBIE"
+                    <Border Grid.Row="1"
+                            x:Name="DialogMessageContainer"
+                            Margin="0,12,0,0"
+                            CornerRadius="8"
+                            Padding="12,10"
+                            BorderThickness="1"
+                            BorderBrush="#85651C"
+                            Background="#5A4A1F">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock x:Name="DialogMessageTitleTextBlock"
+                                       Grid.Row="0"
                                        TextWrapping="Wrap"
-                                       FontFamily="Cascadia Mono"
-                                       Foreground="#C7D8F0" />
-                        </Border>
+                                       FontWeight="SemiBold"
+                                       Foreground="#FFF8E1"
+                                       Text="Wczesne zakonczenie sesji" />
+                            <TextBlock x:Name="DialogMessageTextBlock"
+                                       Grid.Row="1"
+                                       MaxWidth="{Binding ElementName=DialogContentGrid, Path=ActualWidth}"
+                                       Margin="0,4,0,0"
+                                       TextWrapping="Wrap"
+                                       Foreground="#FFEEC0"
+                                       Text="Aby zakonczyc blokade przed uplywem 30 minut, wpisz dokladnie wymagana fraze." />
+                        </Grid>
+                    </Border>
 
-                        <ui:TextBox x:Name="PhraseTextBox"
-                                    Grid.Row="2"
-                                    Margin="0,10,0,0"
-                                    MinHeight="42"
-                                    VerticalContentAlignment="Center"
-                                    FontSize="14"
-                                    PlaceholderText="Wpisz fraze..." />
+                    <Border Grid.Row="2"
+                            x:Name="ReferencePhraseContainer"
+                            Margin="0,14,0,0"
+                            Padding="10,8"
+                            CornerRadius="8"
+                            BorderBrush="#2E456B"
+                            BorderThickness="1"
+                            Background="#0F1A2B">
+                        <TextBlock x:Name="ReferencePhraseTextBlock"
+                                   Text="NIC_GLUPIEGO_NIE_ZROBIE"
+                                   TextWrapping="Wrap"
+                                   FontFamily="Cascadia Mono"
+                                   Foreground="#C7D8F0" />
+                    </Border>
 
-                        <WrapPanel Grid.Row="3"
-                                   Margin="0,18,0,0"
-                                   HorizontalAlignment="Right">
-                            <ui:Button MinWidth="120"
-                                       Height="40"
-                                       Margin="0,0,12,10"
-                                       Appearance="Secondary"
-                                       Click="HandleCancelClick"
-                                       Content="Anuluj" />
-                            <ui:Button MinWidth="190"
-                                       x:Name="ConfirmButton"
-                                       Height="40"
-                                       Margin="0,0,0,10"
-                                       Appearance="Danger"
-                                       Click="HandleConfirmClick"
-                                       Content="Potwierdz i wylacz" />
-                        </WrapPanel>
+                    <ui:TextBox x:Name="PhraseTextBox"
+                                Grid.Row="3"
+                                Margin="0,10,0,0"
+                                MinHeight="42"
+                                VerticalContentAlignment="Center"
+                                FontSize="14"
+                                PlaceholderText="Wpisz fraze..." />
+
+                    <Grid Grid.Row="4"
+                          Margin="0,18,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <ui:Button Grid.Column="0"
+                                   MinHeight="40"
+                                   Appearance="Secondary"
+                                   Click="HandleCancelClick"
+                                   Content="Anuluj" />
+                        <ui:Button Grid.Column="2"
+                                   x:Name="ConfirmButton"
+                                   MinHeight="40"
+                                   Appearance="Danger"
+                                   Click="HandleConfirmClick"
+                                   Content="Potwierdz i wylacz" />
                     </Grid>
-                </ui:CardControl>
-            </ScrollViewer>
+                </Grid>
+            </ui:CardControl>
         </Grid>
     </Grid>
 </ui:FluentWindow>

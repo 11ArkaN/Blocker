@@ -70,6 +70,7 @@ public sealed class GuardianService : IGuardianService
     {
         if (_guardianProcess is null)
         {
+            TryStopDetachedGuardians();
             return;
         }
 
@@ -126,5 +127,43 @@ public sealed class GuardianService : IGuardianService
     public bool IsHealthy()
     {
         return _guardianProcess is not null && !_guardianProcess.HasExited;
+    }
+
+    private void TryStopDetachedGuardians()
+    {
+        try
+        {
+            var guardianName = Path.GetFileNameWithoutExtension(_guardianExecutablePath);
+            if (string.IsNullOrWhiteSpace(guardianName))
+            {
+                return;
+            }
+
+            foreach (var process in Process.GetProcessesByName(guardianName))
+            {
+                try
+                {
+                    if (process.HasExited)
+                    {
+                        continue;
+                    }
+
+                    process.Kill(entireProcessTree: true);
+                    process.WaitForExit(2000);
+                }
+                catch
+                {
+                    // Best effort cleanup.
+                }
+                finally
+                {
+                    process.Dispose();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn($"Failed to stop detached guardian instances: {ex.Message}");
+        }
     }
 }

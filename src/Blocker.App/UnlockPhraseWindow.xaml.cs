@@ -50,9 +50,9 @@ public partial class UnlockPhraseWindow : Wpf.Ui.Controls.FluentWindow
         {
             Title = "Ustaw fraze";
             DialogTitleBar.Title = "Ustaw fraze Focus Lock";
-            DialogCard.Header = "Ustaw fraze do wczesnego odblokowania";
-            DialogInfoBar.Title = "Nowa sesja";
-            DialogInfoBar.Message = "Przed wlaczeniem blokady ustaw fraze. Bedzie wymagana do wylaczenia przed uplywem 30 minut.";
+            DialogSectionTitleTextBlock.Text = "Ustaw fraze do wczesnego odblokowania";
+            DialogMessageTitleTextBlock.Text = "Nowa sesja";
+            DialogMessageTextBlock.Text = "Przed wlaczeniem blokady ustaw fraze. Bedzie wymagana do wylaczenia przed uplywem 30 minut.";
             ReferencePhraseContainer.Visibility = Visibility.Collapsed;
             PhraseTextBox.PlaceholderText = "Ustaw fraze...";
             ConfirmButton.Content = "Ustaw i wlacz";
@@ -61,9 +61,9 @@ public partial class UnlockPhraseWindow : Wpf.Ui.Controls.FluentWindow
 
         Title = "Potwierdzenie";
         DialogTitleBar.Title = "Potwierdzenie Focus Lock";
-        DialogCard.Header = "Wpisz fraze potwierdzajaca";
-        DialogInfoBar.Title = "Wczesne zakonczenie sesji";
-        DialogInfoBar.Message = "Aby zakonczyc blokade przed uplywem 30 minut, wpisz dokladnie wymagana fraze.";
+        DialogSectionTitleTextBlock.Text = "Wpisz fraze potwierdzajaca";
+        DialogMessageTitleTextBlock.Text = "Wczesne zakonczenie sesji";
+        DialogMessageTextBlock.Text = "Aby zakonczyc blokade przed uplywem 30 minut, wpisz dokladnie wymagana fraze.";
         ReferencePhraseContainer.Visibility = Visibility.Visible;
         ReferencePhraseTextBlock.Text = string.IsNullOrWhiteSpace(referencePhrase) ? "-" : referencePhrase;
         PhraseTextBox.PlaceholderText = "Wpisz fraze...";
