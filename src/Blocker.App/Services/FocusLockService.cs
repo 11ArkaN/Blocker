@@ -1,5 +1,5 @@
-using Blocker.App.Constants;
 using Blocker.App.Contracts;
+using Blocker.App.Constants;
 
 namespace Blocker.App.Services;
 
@@ -17,16 +17,16 @@ public sealed class FocusLockService : IFocusLockService
         return lockEndUtc.HasValue && nowUtc < lockEndUtc.Value;
     }
 
-    public bool ValidatePhrase(string? input)
+    public bool ValidatePhrase(string? input, string? expectedPhrase)
     {
-        if (string.IsNullOrWhiteSpace(input))
+        if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(expectedPhrase))
         {
             return false;
         }
 
         return string.Equals(
             input.Trim(),
-            BlockerConstants.UnlockPhrase,
+            expectedPhrase.Trim(),
             StringComparison.OrdinalIgnoreCase);
     }
 }

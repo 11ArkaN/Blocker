@@ -14,6 +14,10 @@
     <ProjectReference Include="..\Blocker.Guardian\Blocker.Guardian.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="WPF-UI" Version="4.2.0" />
+  </ItemGroup>
+
   <Target Name="CopyGuardianBinary" AfterTargets="Build">
     <ItemGroup>
       <GuardianFiles Include="..\Blocker.Guardian\bin\$(Configuration)\net9.0\Blocker.Guardian.exe" />

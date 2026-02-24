@@ -1,10 +1,10 @@
 using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
-using Blocker.App.Constants;
 using Blocker.App.Contracts;
 using Blocker.App.Services;
 using Blocker.App.ViewModels;
+using Wpf.Ui.Appearance;
 
 namespace Blocker.App;
 
@@ -23,6 +23,7 @@ public partial class App : System.Windows.Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        ApplicationThemeManager.Apply(ApplicationTheme.Dark);
         HookGlobalExceptionHandlers();
 
         try
@@ -33,7 +34,7 @@ public partial class App : System.Windows.Application
         {
             _logger?.Error("Fatal startup exception.", ex);
             System.Windows.MessageBox.Show(
-                $"Application startup failed:{Environment.NewLine}{ex.Message}",
+                $"Nie udało się uruchomić aplikacji:{Environment.NewLine}{ex.Message}",
                 "Blocker",
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Error);
@@ -143,7 +144,7 @@ public partial class App : System.Windows.Application
         }
 
         _logger.Warn("Detected unclean shutdown with active block. Restoring access.");
-        var result = await _orchestrator.DisableAsync(BlockerConstants.UnlockPhrase);
+        var result = await _orchestrator.DisableAsync(bypassFocusLock: true);
         if (!result.Success)
         {
             _logger.Error("Recovery disable operation completed with errors.");
@@ -198,7 +199,7 @@ public partial class App : System.Windows.Application
         if (_viewModel?.IsBlockActive == true)
         {
             System.Windows.MessageBox.Show(
-                "Disable blocking before exiting the app.",
+                "Najpierw wyłącz blokadę, aby zamknąć aplikację.",
                 "Blocker",
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Warning);
@@ -221,7 +222,7 @@ public partial class App : System.Windows.Application
             var current = await _orchestrator.GetStateAsync();
             if (current.IsActive)
             {
-                await _orchestrator.DisableAsync(BlockerConstants.UnlockPhrase);
+                await _orchestrator.DisableAsync(bypassFocusLock: true);
             }
 
             current = await _orchestrator.GetStateAsync();
@@ -232,6 +233,7 @@ public partial class App : System.Windows.Application
                     current.IsActive,
                     current.ActivatedAt,
                     current.FocusLockUntil,
+                    current.UnlockPhrase,
                     current.IsActive,
                     isClean);
             }
@@ -292,7 +294,7 @@ public partial class App : System.Windows.Application
         }
 
         System.Windows.MessageBox.Show(
-            $"Unexpected error:{Environment.NewLine}{e.Exception.Message}",
+            $"Wystąpił nieoczekiwany błąd:{Environment.NewLine}{e.Exception.Message}",
             "Blocker",
             System.Windows.MessageBoxButton.OK,
             System.Windows.MessageBoxImage.Error);

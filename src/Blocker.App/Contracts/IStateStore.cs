@@ -11,6 +11,7 @@ public interface IStateStore
         bool isBlockActive,
         DateTimeOffset? activatedAt,
         DateTimeOffset? focusLockUntil,
+        string? unlockPhrase,
         bool guardianExpectedRunning,
         bool lastShutdownClean,
         CancellationToken cancellationToken = default);

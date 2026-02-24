@@ -1,4 +1,5 @@
 using Blocker.App.Contracts;
+using Blocker.App.Constants;
 using Blocker.App.Models;
 
 namespace Blocker.App.Services;
@@ -18,6 +19,7 @@ public sealed class BlockOrchestrator : IBlockOrchestrator
     private bool _isActive;
     private DateTimeOffset? _activatedAtUtc;
     private DateTimeOffset? _focusLockUntilUtc;
+    private string? _unlockPhrase;
     private bool _guardianExpectedRunning;
 
     public BlockOrchestrator(
@@ -48,7 +50,14 @@ public sealed class BlockOrchestrator : IBlockOrchestrator
         _isActive = persisted.IsBlockActive;
         _activatedAtUtc = persisted.ActivatedAtUtc;
         _focusLockUntilUtc = persisted.FocusLockUntilUtc;
+        _unlockPhrase = persisted.UnlockPhrase;
         _guardianExpectedRunning = persisted.GuardianExpectedRunning;
+
+        // Backward compatibility for sessions persisted before phrase-per-session support.
+        if (_isActive && string.IsNullOrWhiteSpace(_unlockPhrase))
+        {
+            _unlockPhrase = BlockerConstants.UnlockPhrase;
+        }
 
         if (!_isActive || !resumeActiveRuntime)
         {
@@ -67,13 +76,20 @@ public sealed class BlockOrchestrator : IBlockOrchestrator
         _logger.Info("Resumed runtime services for active block session.");
     }
 
-    public async Task<BlockResult> EnableAsync(CancellationToken cancellationToken = default)
+    public async Task<BlockResult> EnableAsync(string unlockPhrase, CancellationToken cancellationToken = default)
     {
         await _gate.WaitAsync(cancellationToken);
         try
         {
             var messages = new List<string>();
             var errors = new List<string>();
+            var normalizedPhrase = unlockPhrase?.Trim();
+
+            if (string.IsNullOrWhiteSpace(normalizedPhrase))
+            {
+                errors.Add("Unlock phrase must be set before enabling block.");
+                return BuildResult(messages, errors);
+            }
 
             if (!AdminService.IsAdministrator())
             {
@@ -129,6 +145,7 @@ public sealed class BlockOrchestrator : IBlockOrchestrator
             _isActive = true;
             _activatedAtUtc = DateTimeOffset.UtcNow;
             _focusLockUntilUtc = _focusLockService.ComputeLockEnd(_activatedAtUtc.Value);
+            _unlockPhrase = normalizedPhrase;
             _guardianExpectedRunning = true;
             await PersistCurrentStateAsync(lastShutdownClean: false, cancellationToken);
 
@@ -142,7 +159,10 @@ public sealed class BlockOrchestrator : IBlockOrchestrator
         }
     }
 
-    public async Task<BlockResult> DisableAsync(string? unlockPhrase = null, CancellationToken cancellationToken = default)
+    public async Task<BlockResult> DisableAsync(
+        string? unlockPhrase = null,
+        bool bypassFocusLock = false,
+        CancellationToken cancellationToken = default)
     {
         await _gate.WaitAsync(cancellationToken);
         try
@@ -150,9 +170,9 @@ public sealed class BlockOrchestrator : IBlockOrchestrator
             var messages = new List<string>();
             var errors = new List<string>();
 
-            if (_isActive && _focusLockService.IsPhraseRequired(_focusLockUntilUtc, DateTimeOffset.UtcNow))
+            if (!bypassFocusLock && _isActive && _focusLockService.IsPhraseRequired(_focusLockUntilUtc, DateTimeOffset.UtcNow))
             {
-                if (!_focusLockService.ValidatePhrase(unlockPhrase))
+                if (!_focusLockService.ValidatePhrase(unlockPhrase, _unlockPhrase))
                 {
                     errors.Add("Unlock phrase is required during focus lock.");
                     return BuildResult(messages, errors);
@@ -178,6 +198,7 @@ public sealed class BlockOrchestrator : IBlockOrchestrator
             _isActive = false;
             _activatedAtUtc = null;
             _focusLockUntilUtc = null;
+            _unlockPhrase = null;
             _guardianExpectedRunning = false;
             await PersistCurrentStateAsync(lastShutdownClean: false, cancellationToken);
 
@@ -200,6 +221,7 @@ public sealed class BlockOrchestrator : IBlockOrchestrator
             IsActive = _isActive,
             ActivatedAt = _activatedAtUtc,
             FocusLockUntil = _focusLockUntilUtc,
+            UnlockPhrase = _isActive ? _unlockPhrase : null,
             IsFocusUnlockPhraseRequired = _isActive && _focusLockService.IsPhraseRequired(_focusLockUntilUtc, nowUtc),
             IsGuardianHealthy = _isActive && _guardianService.IsHealthy(),
             IsAdmin = AdminService.IsAdministrator()
@@ -233,6 +255,7 @@ public sealed class BlockOrchestrator : IBlockOrchestrator
         _isActive = false;
         _activatedAtUtc = null;
         _focusLockUntilUtc = null;
+        _unlockPhrase = null;
         _guardianExpectedRunning = false;
         await PersistCurrentStateAsync(lastShutdownClean: false, cancellationToken);
     }
@@ -245,6 +268,7 @@ public sealed class BlockOrchestrator : IBlockOrchestrator
                 IsBlockActive = _isActive,
                 ActivatedAtUtc = _activatedAtUtc,
                 FocusLockUntilUtc = _focusLockUntilUtc,
+                UnlockPhrase = _isActive ? _unlockPhrase : null,
                 GuardianExpectedRunning = _guardianExpectedRunning,
                 LastShutdownClean = lastShutdownClean,
                 UpdatedAtUtc = DateTimeOffset.UtcNow

@@ -188,7 +188,7 @@
                                     BorderBrush="#2E456B"
                                     Background="#0F1A2B">
                                 <TextBlock TextWrapping="Wrap"
-                                           Text="Fraza: NIC_GLUPIEGO_NIE_ZROBIE"
+                                           Text="{Binding UnlockPhraseDisplay}"
                                            FontFamily="Cascadia Mono"
                                            Foreground="#C7D8F0" />
                             </Border>

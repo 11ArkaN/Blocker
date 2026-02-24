@@ -4,13 +4,14 @@ using Blocker.App.ViewModels;
 
 namespace Blocker.App;
 
-public partial class MainWindow : System.Windows.Window
+public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 {
     public MainWindow(MainWindowViewModel viewModel)
     {
         InitializeComponent();
         ViewModel = viewModel;
         DataContext = viewModel;
+        viewModel.RequestSetupUnlockPhraseAsync = RequestSetupUnlockPhraseAsync;
         viewModel.RequestUnlockPhraseAsync = RequestUnlockPhraseAsync;
         StateChanged += HandleStateChanged;
     }
@@ -32,9 +33,20 @@ public partial class MainWindow : System.Windows.Window
         base.OnClosing(e);
     }
 
-    private Task<string?> RequestUnlockPhraseAsync()
+    private Task<string?> RequestSetupUnlockPhraseAsync()
     {
-        var dialog = new UnlockPhraseWindow
+        var dialog = new UnlockPhraseWindow(UnlockPhraseWindowMode.Setup)
+        {
+            Owner = this
+        };
+
+        var result = dialog.ShowDialog();
+        return Task.FromResult(result == true ? dialog.EnteredPhrase : null);
+    }
+
+    private Task<string?> RequestUnlockPhraseAsync(string? requiredPhrase)
+    {
+        var dialog = new UnlockPhraseWindow(UnlockPhraseWindowMode.Verify, requiredPhrase)
         {
             Owner = this
         };

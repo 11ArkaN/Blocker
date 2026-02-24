@@ -67,6 +67,7 @@ public sealed class JsonStateStore : IStateStore
         bool isBlockActive,
         DateTimeOffset? activatedAt,
         DateTimeOffset? focusLockUntil,
+        string? unlockPhrase,
         bool guardianExpectedRunning,
         bool lastShutdownClean,
         CancellationToken cancellationToken = default)
@@ -78,6 +79,7 @@ public sealed class JsonStateStore : IStateStore
             state.IsBlockActive = isBlockActive;
             state.ActivatedAtUtc = activatedAt?.ToUniversalTime();
             state.FocusLockUntilUtc = focusLockUntil?.ToUniversalTime();
+            state.UnlockPhrase = unlockPhrase;
             state.GuardianExpectedRunning = guardianExpectedRunning;
             state.LastShutdownClean = lastShutdownClean;
             state.UpdatedAtUtc = DateTimeOffset.UtcNow;
