@@ -114,6 +114,7 @@ public partial class App : System.Windows.Application
         };
 
         _mainWindow = new MainWindow(_viewModel, _localizationService);
+        ApplicationThemeManager.Apply(ApplicationTheme.Dark, _mainWindow.WindowBackdropType, true);
         _trayService = new TrayService(_localizationService);
         WireTrayEvents();
         _trayService.SetBlockState(_viewModel.IsBlockActive);
@@ -344,4 +345,3 @@ public partial class App : System.Windows.Application
         return _localizationService is null ? key : _localizationService[key];
     }
 }
-

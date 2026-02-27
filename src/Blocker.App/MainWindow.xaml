@@ -8,8 +8,9 @@
                  MinWidth="640"
                  MinHeight="520"
                  WindowStartupLocation="CenterScreen"
+                 Foreground="White"
                  Background="{DynamicResource AppChromeBrush}">
-    <Grid>
+    <Grid TextElement.Foreground="White">
         <Rectangle Fill="#060A10" />
 
         <!-- Ambient glow: top-left teal -->
@@ -99,8 +100,10 @@
                                     Margin="28,0,0,0">
                             <ui:Badge Appearance="{Binding ModeBadgeAppearance}"
                                       Margin="0,0,0,6"
+                                      Foreground="#F3F8FF"
                                       Content="{Binding StatusBadgeText}" />
                             <ui:Badge Appearance="{Binding GuardianBadgeAppearance}"
+                                      Foreground="#F3F8FF"
                                       Content="{Binding GuardianStatus}" />
                             <TextBlock Margin="0,16,0,4"
                                        Foreground="{DynamicResource AppMutingTextBrush}"
@@ -147,6 +150,7 @@
                         <StackPanel>
                             <ui:InfoBar IsOpen="True"
                                         IsClosable="False"
+                                        Foreground="#F3F8FF"
                                         Severity="{Binding StatusSeverity}"
                                         Title="{Binding StatusTitle}"
                                         Message="{Binding StatusText}" />
@@ -165,6 +169,7 @@
                                                Foreground="{DynamicResource AppMutingTextBrush}"
                                                Text="{Binding Localization[Main.AdminLabel]}" />
                                     <ui:Badge Margin="0,6,0,0"
+                                              Foreground="#F3F8FF"
                                               Appearance="{Binding AdminBadgeAppearance}"
                                               Content="{Binding AdminStatus}" />
                                 </StackPanel>
@@ -175,6 +180,7 @@
                                                Foreground="{DynamicResource AppMutingTextBrush}"
                                                Text="{Binding Localization[Main.GuardianLabel]}" />
                                     <ui:Badge Margin="0,6,0,0"
+                                              Foreground="#F3F8FF"
                                               Appearance="{Binding GuardianBadgeAppearance}"
                                               Content="{Binding GuardianStatus}" />
                                 </StackPanel>
@@ -185,6 +191,7 @@
                                                Foreground="{DynamicResource AppMutingTextBrush}"
                                                Text="{Binding Localization[Main.ModeLabel]}" />
                                     <ui:Badge Margin="0,6,0,0"
+                                              Foreground="#F3F8FF"
                                               Appearance="{Binding ModeBadgeAppearance}"
                                               Content="{Binding StatusBadgeText}" />
                                 </StackPanel>
@@ -225,6 +232,7 @@
                                            FontWeight="SemiBold"
                                            HorizontalAlignment="Stretch"
                                            HorizontalContentAlignment="Center"
+                                           Foreground="#FFFFFF"
                                            Appearance="{Binding ToggleButtonAppearance}"
                                            IsEnabled="{Binding CanInteract}"
                                            Command="{Binding ToggleBlockCommand}"
@@ -234,6 +242,7 @@
                                            Height="46"
                                            MinWidth="140"
                                            HorizontalContentAlignment="Center"
+                                           Foreground="#FFFFFF"
                                            Appearance="Secondary"
                                            IsEnabled="{Binding CanInteract}"
                                            Command="{Binding RefreshCommand}"
@@ -269,6 +278,7 @@
                             <ui:InfoBar Margin="0,12,0,0"
                                         IsClosable="False"
                                         IsOpen="{Binding IsFocusPhraseRequired}"
+                                        Foreground="#F3F8FF"
                                         Severity="Warning"
                                         Title="{Binding Localization[Main.FocusPhraseRequiredTitle]}"
                                         Message="{Binding Localization[Main.FocusPhraseRequiredMessage]}" />

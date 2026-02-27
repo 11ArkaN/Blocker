@@ -9,8 +9,9 @@
                  MinHeight="320"
                  ResizeMode="CanResizeWithGrip"
                  WindowStartupLocation="CenterOwner"
+                 Foreground="White"
                  Background="{DynamicResource AppChromeBrush}">
-    <Grid>
+    <Grid TextElement.Foreground="White">
         <Rectangle Fill="#060A10" />
 
         <!-- Ambient glow: top-left -->

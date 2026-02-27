@@ -10,6 +10,14 @@
                 <ui:ControlsDictionary />
             </ResourceDictionary.MergedDictionaries>
 
+            <!-- WPF-UI dark-theme text brush overrides -->
+            <SolidColorBrush x:Key="TextFillColorPrimaryBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="TextFillColorSecondaryBrush" Color="#C5C5C5" />
+            <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="#9E9E9E" />
+            <SolidColorBrush x:Key="TextFillColorDisabledBrush" Color="#5C5C5C" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#E4E4E4" />
+
             <SolidColorBrush x:Key="AppChromeBrush" Color="#070B12" />
             <SolidColorBrush x:Key="AppPanelBrush" Color="#0D1219" />
             <SolidColorBrush x:Key="AppPanelBorderBrush" Color="#182334" />
