@@ -10,28 +10,34 @@
                  WindowStartupLocation="CenterScreen"
                  Background="{DynamicResource AppChromeBrush}">
     <Grid>
-        <Rectangle Fill="#0A1220" />
-        <Ellipse Width="380"
-                 Height="380"
+        <Rectangle Fill="#060A10" />
+
+        <!-- Ambient glow: top-left teal -->
+        <Ellipse Width="520"
+                 Height="520"
                  HorizontalAlignment="Left"
                  VerticalAlignment="Top"
-                 Margin="-120,-140,0,0">
+                 Margin="-220,-200,0,0"
+                 IsHitTestVisible="False">
             <Ellipse.Fill>
                 <RadialGradientBrush>
-                    <GradientStop Offset="0" Color="#3A66A6" />
-                    <GradientStop Offset="1" Color="#003A66A6" />
+                    <GradientStop Offset="0" Color="#200E7490" />
+                    <GradientStop Offset="1" Color="#00000000" />
                 </RadialGradientBrush>
             </Ellipse.Fill>
         </Ellipse>
-        <Ellipse Width="420"
-                 Height="420"
+
+        <!-- Ambient glow: bottom-right indigo -->
+        <Ellipse Width="600"
+                 Height="600"
                  HorizontalAlignment="Right"
                  VerticalAlignment="Bottom"
-                 Margin="0,0,-180,-160">
+                 Margin="0,0,-260,-260"
+                 IsHitTestVisible="False">
             <Ellipse.Fill>
                 <RadialGradientBrush>
-                    <GradientStop Offset="0" Color="#30406F9A" />
-                    <GradientStop Offset="1" Color="#00406F9A" />
+                    <GradientStop Offset="0" Color="#163730B8" />
+                    <GradientStop Offset="1" Color="#00000000" />
                 </RadialGradientBrush>
             </Ellipse.Fill>
         </Ellipse>
@@ -46,40 +52,59 @@
                          Title="Blocker"
                          Margin="8,8,8,0" />
 
-            <Grid Grid.Row="1"
-                  Margin="20,14,20,20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+              <StackPanel Margin="24,10,24,24">
 
-                <ui:CardControl Grid.Row="0"
-                                Header="{Binding Localization[Main.FocusDashboardHeader]}"
-                                BorderBrush="#34507B"
-                                Background="{DynamicResource AppHeroBrush}"
-                                Padding="18">
-                    <WrapPanel>
-                        <StackPanel MinWidth="320"
-                                    Margin="0,0,16,10">
-                            <TextBlock FontSize="28"
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- HERO BANNER                                -->
+                <!-- ═══════════════════════════════════════════ -->
+                <Border
+                        CornerRadius="14"
+                        BorderThickness="1"
+                        BorderBrush="#152540"
+                        Padding="26,22"
+                        Background="{DynamicResource AppHeroBrush}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left: Title + Description -->
+                        <StackPanel Grid.Column="0"
+                                    VerticalAlignment="Center">
+                            <TextBlock FontSize="11"
                                        FontWeight="SemiBold"
-                                       Text="{Binding Localization[Main.HeroTitle]}" />
+                                       Foreground="#0EA5E9"
+                                       Text="{Binding Localization[Main.FocusDashboardHeader]}" />
                             <TextBlock Margin="0,8,0,0"
-                                       Foreground="#C8D8F3"
-                                       FontSize="14"
+                                       FontSize="24"
+                                       FontWeight="Bold"
+                                       Foreground="#EDF2FA"
+                                       Text="{Binding Localization[Main.HeroTitle]}" />
+                            <TextBlock Margin="0,6,0,0"
+                                       Foreground="#6B809A"
+                                       FontSize="13"
                                        TextWrapping="Wrap"
+                                       MaxWidth="480"
+                                       HorizontalAlignment="Left"
                                        Text="{Binding Localization[Main.HeroDescription]}" />
                         </StackPanel>
-                        <StackPanel VerticalAlignment="Center"
-                                    Margin="0,0,0,6">
+
+                        <!-- Right: Badges + Language -->
+                        <StackPanel Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Margin="28,0,0,0">
                             <ui:Badge Appearance="{Binding ModeBadgeAppearance}"
-                                      Margin="0,0,0,8"
+                                      Margin="0,0,0,6"
                                       Content="{Binding StatusBadgeText}" />
                             <ui:Badge Appearance="{Binding GuardianBadgeAppearance}"
                                       Content="{Binding GuardianStatus}" />
-                            <TextBlock Margin="0,12,0,4"
+                            <TextBlock Margin="0,16,0,4"
                                        Foreground="{DynamicResource AppMutingTextBrush}"
+                                       FontSize="11"
                                        Text="{Binding Localization[Main.LanguageLabel]}" />
                             <ComboBox x:Name="LanguageComboBox"
                                       SelectedValue="{Binding SelectedLanguageCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -92,100 +117,153 @@
                                               Content="{Binding Localization[Main.LanguageEnglish]}" />
                             </ComboBox>
                         </StackPanel>
-                    </WrapPanel>
-                </ui:CardControl>
+                    </Grid>
+                </Border>
 
-                <StackPanel Grid.Row="1"
-                            Margin="0,14,0,14">
-                    <ui:CardControl Header="{Binding Localization[Main.StatusControlHeader]}"
-                                    BorderBrush="{DynamicResource AppPanelBorderBrush}"
-                                    Background="{DynamicResource AppPanelBrush}"
-                                    Padding="14">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- STATUS + FOCUS LOCK SECTIONS               -->
+                <!-- ═══════════════════════════════════════════ -->
+                <StackPanel>
 
-                            <ui:InfoBar Grid.Row="0"
-                                        IsOpen="True"
+                    <!-- ── Status & Controls ── -->
+                    <StackPanel Orientation="Horizontal"
+                                Margin="4,20,0,10">
+                        <Border Width="3"
+                                Height="14"
+                                CornerRadius="2"
+                                Background="#0EA5E9" />
+                        <TextBlock Margin="10,0,0,0"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="#4B6178"
+                                   Text="{Binding Localization[Main.StatusControlHeader]}" />
+                    </StackPanel>
+
+                    <Border CornerRadius="12"
+                            BorderThickness="1"
+                            BorderBrush="{DynamicResource AppPanelBorderBrush}"
+                            Background="{DynamicResource AppPanelBrush}"
+                            Padding="20,18">
+                        <StackPanel>
+                            <ui:InfoBar IsOpen="True"
                                         IsClosable="False"
                                         Severity="{Binding StatusSeverity}"
                                         Title="{Binding StatusTitle}"
                                         Message="{Binding StatusText}" />
 
-                            <WrapPanel Grid.Row="1"
-                                       Margin="0,12,0,0">
-                                <StackPanel MinWidth="150"
-                                            Margin="0,0,10,10">
-                                    <TextBlock Foreground="{DynamicResource AppMutingTextBrush}"
+                            <!-- Status indicator badges -->
+                            <Grid Margin="0,16,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0"
+                                            Margin="0,0,8,0">
+                                    <TextBlock FontSize="11"
+                                               Foreground="{DynamicResource AppMutingTextBrush}"
                                                Text="{Binding Localization[Main.AdminLabel]}" />
                                     <ui:Badge Margin="0,6,0,0"
                                               Appearance="{Binding AdminBadgeAppearance}"
                                               Content="{Binding AdminStatus}" />
                                 </StackPanel>
-                                <StackPanel MinWidth="150"
-                                            Margin="0,0,10,10">
-                                    <TextBlock Foreground="{DynamicResource AppMutingTextBrush}"
+
+                                <StackPanel Grid.Column="1"
+                                            Margin="8,0,8,0">
+                                    <TextBlock FontSize="11"
+                                               Foreground="{DynamicResource AppMutingTextBrush}"
                                                Text="{Binding Localization[Main.GuardianLabel]}" />
                                     <ui:Badge Margin="0,6,0,0"
                                               Appearance="{Binding GuardianBadgeAppearance}"
                                               Content="{Binding GuardianStatus}" />
                                 </StackPanel>
-                                <StackPanel MinWidth="150"
-                                            Margin="0,0,0,10">
-                                    <TextBlock Foreground="{DynamicResource AppMutingTextBrush}"
+
+                                <StackPanel Grid.Column="2"
+                                            Margin="8,0,0,0">
+                                    <TextBlock FontSize="11"
+                                               Foreground="{DynamicResource AppMutingTextBrush}"
                                                Text="{Binding Localization[Main.ModeLabel]}" />
                                     <ui:Badge Margin="0,6,0,0"
                                               Appearance="{Binding ModeBadgeAppearance}"
                                               Content="{Binding StatusBadgeText}" />
                                 </StackPanel>
-                            </WrapPanel>
+                            </Grid>
 
-                            <WrapPanel Grid.Row="2"
-                                       Margin="0,14,0,0">
-                                <StackPanel MinWidth="260"
-                                            Margin="0,0,14,12">
-                                    <TextBlock Foreground="{DynamicResource AppMutingTextBrush}"
-                                               Text="{Binding ActiveSinceText}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               FontWeight="SemiBold"
-                                               Text="{Binding FocusLockText}" />
-                                    <ProgressBar Margin="0,10,0,0"
-                                                 MinWidth="220"
-                                                 Height="8"
-                                                 Minimum="0"
-                                                 Maximum="100"
-                                                 Value="{Binding FocusProgressPercent, Mode=OneWay}" />
-                                </StackPanel>
+                            <!-- Separator -->
+                            <Rectangle Height="1"
+                                       Fill="#141E2E"
+                                       Margin="0,16,0,16" />
 
-                                <StackPanel MinWidth="200"
-                                            VerticalAlignment="Top">
-                                    <ui:Button Height="52"
-                                               FontSize="17"
-                                               FontWeight="SemiBold"
-                                               Appearance="{Binding ToggleButtonAppearance}"
-                                               IsEnabled="{Binding CanInteract}"
-                                               Command="{Binding ToggleBlockCommand}"
-                                               Content="{Binding ToggleButtonText}" />
-                                    <ui:Button Margin="0,10,0,0"
-                                               Appearance="Secondary"
-                                               IsEnabled="{Binding CanInteract}"
-                                               Command="{Binding RefreshCommand}"
-                                               Content="{Binding Localization[Main.RefreshStatus]}" />
-                                </StackPanel>
-                            </WrapPanel>
-                        </Grid>
-                    </ui:CardControl>
+                            <!-- Activity info -->
+                            <TextBlock Foreground="{DynamicResource AppMutingTextBrush}"
+                                       FontSize="12"
+                                       Text="{Binding ActiveSinceText}" />
+                            <TextBlock Margin="0,5,0,0"
+                                       FontWeight="SemiBold"
+                                       FontSize="13"
+                                       Foreground="#C0D0E4"
+                                       Text="{Binding FocusLockText}" />
 
-                    <ui:CardControl Margin="0,12,0,0"
-                                    Header="{Binding Localization[Main.FocusLockHeader]}"
-                                    BorderBrush="{DynamicResource AppPanelBorderBrush}"
-                                    Background="{DynamicResource AppPanelBrush}"
-                                    Padding="14">
+                            <!-- Progress bar -->
+                            <ProgressBar Margin="0,12,0,0"
+                                         Height="6"
+                                         Minimum="0"
+                                         Maximum="100"
+                                         Value="{Binding FocusProgressPercent, Mode=OneWay}" />
+
+                            <!-- Action buttons -->
+                            <Grid Margin="0,18,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <ui:Button Grid.Column="0"
+                                           Height="46"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           HorizontalAlignment="Stretch"
+                                           HorizontalContentAlignment="Center"
+                                           Appearance="{Binding ToggleButtonAppearance}"
+                                           IsEnabled="{Binding CanInteract}"
+                                           Command="{Binding ToggleBlockCommand}"
+                                           Content="{Binding ToggleButtonText}" />
+                                <ui:Button Grid.Column="1"
+                                           Margin="10,0,0,0"
+                                           Height="46"
+                                           MinWidth="140"
+                                           HorizontalContentAlignment="Center"
+                                           Appearance="Secondary"
+                                           IsEnabled="{Binding CanInteract}"
+                                           Command="{Binding RefreshCommand}"
+                                           Content="{Binding Localization[Main.RefreshStatus]}" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ── Focus Lock ── -->
+                    <StackPanel Orientation="Horizontal"
+                                Margin="4,20,0,10">
+                        <Border Width="3"
+                                Height="14"
+                                CornerRadius="2"
+                                Background="#F59E0B" />
+                        <TextBlock Margin="10,0,0,0"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="#4B6178"
+                                   Text="{Binding Localization[Main.FocusLockHeader]}" />
+                    </StackPanel>
+
+                    <Border CornerRadius="12"
+                            BorderThickness="1"
+                            BorderBrush="{DynamicResource AppPanelBorderBrush}"
+                            Background="{DynamicResource AppPanelBrush}"
+                            Padding="20,18">
                         <StackPanel>
                             <TextBlock Foreground="{DynamicResource AppMutingTextBrush}"
+                                       FontSize="13"
                                        TextWrapping="Wrap"
                                        Text="{Binding Localization[Main.FocusLockDescription]}" />
                             <ui:InfoBar Margin="0,12,0,0"
@@ -195,48 +273,69 @@
                                         Title="{Binding Localization[Main.FocusPhraseRequiredTitle]}"
                                         Message="{Binding Localization[Main.FocusPhraseRequiredMessage]}" />
                             <Border Margin="0,12,0,0"
-                                    Padding="12"
-                                    CornerRadius="10"
+                                    Padding="14,10"
+                                    CornerRadius="8"
                                     BorderThickness="1"
-                                    BorderBrush="#2E456B"
-                                    Background="#0F1A2B">
+                                    BorderBrush="#162338"
+                                    Background="#090F18">
                                 <TextBlock TextWrapping="Wrap"
                                            Text="{Binding UnlockPhraseDisplay}"
                                            FontFamily="Cascadia Mono"
-                                           Foreground="#C7D8F0" />
+                                           FontSize="13"
+                                           Foreground="#8FA4BE" />
                             </Border>
                         </StackPanel>
-                    </ui:CardControl>
+                    </Border>
                 </StackPanel>
 
-                <ui:CardControl Grid.Row="2"
-                                Header="{Binding Localization[Main.EventLogHeader]}"
-                                BorderBrush="{DynamicResource AppPanelBorderBrush}"
-                                Background="{DynamicResource AppPanelBrush}"
-                                Padding="12">
+                <!-- ═══════════════════════════════════════════ -->
+                <!-- EVENT LOG                                  -->
+                <!-- ═══════════════════════════════════════════ -->
+                <StackPanel Orientation="Horizontal"
+                            Margin="4,20,0,10">
+                    <Border Width="3"
+                            Height="14"
+                            CornerRadius="2"
+                            Background="#64748B" />
+                    <TextBlock Margin="10,0,0,0"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="#4B6178"
+                               Text="{Binding Localization[Main.EventLogHeader]}" />
+                </StackPanel>
+
+                <Border CornerRadius="12"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource AppPanelBorderBrush}"
+                        Background="{DynamicResource AppPanelBrush}"
+                        Padding="14">
                     <ListBox ItemsSource="{Binding ActivityLog}"
-                             MinHeight="120"
+                             MinHeight="220"
+                             MaxHeight="340"
                              FontFamily="Cascadia Mono"
+                             FontSize="12"
                              BorderThickness="0"
                              Background="Transparent"
                              ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border Margin="0,0,0,8"
-                                        Padding="10,8"
-                                        CornerRadius="8"
-                                        Background="#11213A"
-                                        BorderBrush="#2B4366"
+                                <Border Margin="0,0,0,3"
+                                        Padding="10,7"
+                                        CornerRadius="6"
+                                        Background="#0A1018"
+                                        BorderBrush="#141E2E"
                                         BorderThickness="1">
                                     <TextBlock Text="{Binding}"
-                                               Foreground="#E6EEFF"
+                                               Foreground="#A0B4CC"
                                                TextWrapping="Wrap" />
                                 </Border>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                </ui:CardControl>
-            </Grid>
+                </Border>
+
+              </StackPanel>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </ui:FluentWindow>

@@ -10,16 +10,17 @@
                 <ui:ControlsDictionary />
             </ResourceDictionary.MergedDictionaries>
 
-            <SolidColorBrush x:Key="AppChromeBrush" Color="#0B0F1C" />
-            <SolidColorBrush x:Key="AppPanelBrush" Color="#121A2A" />
-            <SolidColorBrush x:Key="AppPanelBorderBrush" Color="#243551" />
-            <SolidColorBrush x:Key="AppMutingTextBrush" Color="#9FB0CC" />
+            <SolidColorBrush x:Key="AppChromeBrush" Color="#070B12" />
+            <SolidColorBrush x:Key="AppPanelBrush" Color="#0D1219" />
+            <SolidColorBrush x:Key="AppPanelBorderBrush" Color="#182334" />
+            <SolidColorBrush x:Key="AppMutingTextBrush" Color="#5F7289" />
+            <SolidColorBrush x:Key="AppAccentBrush" Color="#0EA5E9" />
             <LinearGradientBrush x:Key="AppHeroBrush"
                                  StartPoint="0,0"
                                  EndPoint="1,1">
-                <GradientStop Offset="0.0" Color="#0E203B" />
-                <GradientStop Offset="0.55" Color="#152846" />
-                <GradientStop Offset="1.0" Color="#1C2D4A" />
+                <GradientStop Offset="0.0" Color="#0B1628" />
+                <GradientStop Offset="0.5" Color="#101E36" />
+                <GradientStop Offset="1.0" Color="#0C1A30" />
             </LinearGradientBrush>
         </ResourceDictionary>
     </Application.Resources>

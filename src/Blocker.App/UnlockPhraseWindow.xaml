@@ -11,28 +11,34 @@
                  WindowStartupLocation="CenterOwner"
                  Background="{DynamicResource AppChromeBrush}">
     <Grid>
-        <Rectangle Fill="#0A1220" />
-        <Ellipse Width="260"
-                 Height="260"
+        <Rectangle Fill="#060A10" />
+
+        <!-- Ambient glow: top-left -->
+        <Ellipse Width="280"
+                 Height="280"
                  HorizontalAlignment="Left"
                  VerticalAlignment="Top"
-                 Margin="-110,-130,0,0">
+                 Margin="-120,-130,0,0"
+                 IsHitTestVisible="False">
             <Ellipse.Fill>
                 <RadialGradientBrush>
-                    <GradientStop Offset="0" Color="#3A66A6" />
-                    <GradientStop Offset="1" Color="#003A66A6" />
+                    <GradientStop Offset="0" Color="#200E7490" />
+                    <GradientStop Offset="1" Color="#00000000" />
                 </RadialGradientBrush>
             </Ellipse.Fill>
         </Ellipse>
-        <Ellipse Width="300"
-                 Height="300"
+
+        <!-- Ambient glow: bottom-right -->
+        <Ellipse Width="320"
+                 Height="320"
                  HorizontalAlignment="Right"
                  VerticalAlignment="Bottom"
-                 Margin="0,0,-140,-120">
+                 Margin="0,0,-150,-130"
+                 IsHitTestVisible="False">
             <Ellipse.Fill>
                 <RadialGradientBrush>
-                    <GradientStop Offset="0" Color="#30406F9A" />
-                    <GradientStop Offset="1" Color="#00406F9A" />
+                    <GradientStop Offset="0" Color="#163730B8" />
+                    <GradientStop Offset="1" Color="#00000000" />
                 </RadialGradientBrush>
             </Ellipse.Fill>
         </Ellipse>
@@ -48,12 +54,14 @@
                          Title="Focus Lock confirmation"
                          Margin="8,8,8,0" />
 
-            <ui:CardControl Grid.Row="1"
-                            Margin="20,14,20,20"
-                            x:Name="DialogCard"
-                            BorderBrush="#34507B"
-                            Background="{DynamicResource AppHeroBrush}"
-                            Padding="18">
+            <Border Grid.Row="1"
+                    x:Name="DialogCard"
+                    Margin="20,14,20,20"
+                    CornerRadius="14"
+                    BorderThickness="1"
+                    BorderBrush="#152540"
+                    Padding="26,22"
+                    Background="{DynamicResource AppHeroBrush}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled"
                               Focusable="False">
@@ -69,19 +77,19 @@
                         <TextBlock Grid.Row="0"
                                    x:Name="DialogSectionTitleTextBlock"
                                    TextWrapping="Wrap"
-                                   FontSize="28"
-                                   FontWeight="SemiBold"
-                                   Foreground="#F0F6FF"
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   Foreground="#EDF2FA"
                                    Text="Enter confirmation phrase" />
 
                         <Border Grid.Row="1"
                                 x:Name="DialogMessageContainer"
-                                Margin="0,12,0,0"
-                                CornerRadius="8"
-                                Padding="12,10"
+                                Margin="0,14,0,0"
+                                CornerRadius="10"
+                                Padding="14,12"
                                 BorderThickness="1"
                                 BorderBrush="#85651C"
-                                Background="#5A4A1F">
+                                Background="#3D3518">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -92,13 +100,15 @@
                                            Grid.Row="0"
                                            TextWrapping="Wrap"
                                            FontWeight="SemiBold"
-                                           Foreground="#FFF8E1"
+                                           FontSize="13"
+                                           Foreground="#FFF0CC" 
                                            Text="Early session end" />
                                 <TextBlock x:Name="DialogMessageTextBlock"
                                            Grid.Row="1"
                                            Margin="0,4,0,0"
                                            TextWrapping="Wrap"
-                                           Foreground="#FFEEC0"
+                                           FontSize="13"
+                                           Foreground="#D4C49A"
                                            Text="To disable blocking before 30 minutes, enter the required phrase exactly." />
                             </Grid>
                         </Border>
@@ -106,28 +116,29 @@
                         <Border Grid.Row="2"
                                 x:Name="ReferencePhraseContainer"
                                 Margin="0,14,0,0"
-                                Padding="10,8"
+                                Padding="14,10"
                                 CornerRadius="8"
-                                BorderBrush="#2E456B"
+                                BorderBrush="#162338"
                                 BorderThickness="1"
-                                Background="#0F1A2B">
+                                Background="#090F18">
                             <TextBlock x:Name="ReferencePhraseTextBlock"
                                        Text="SAMPLE_UNLOCK_PHRASE"
                                        TextWrapping="Wrap"
                                        FontFamily="Cascadia Mono"
-                                       Foreground="#C7D8F0" />
+                                       FontSize="13"
+                                       Foreground="#8FA4BE" />
                         </Border>
 
                         <ui:TextBox x:Name="PhraseTextBox"
                                     Grid.Row="3"
-                                    Margin="0,10,0,0"
+                                    Margin="0,12,0,0"
                                     MinHeight="42"
                                     VerticalContentAlignment="Center"
                                     FontSize="14"
                                     PlaceholderText="Enter phrase..." />
 
                         <Grid Grid.Row="4"
-                              Margin="0,18,0,0">
+                              Margin="0,20,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
@@ -138,6 +149,7 @@
                                        x:Name="CancelButton"
                                        MinWidth="108"
                                        MinHeight="40"
+                                       HorizontalContentAlignment="Center"
                                        Appearance="Secondary"
                                        Click="HandleCancelClick"
                                        Content="Cancel" />
@@ -145,13 +157,14 @@
                                        x:Name="ConfirmButton"
                                        MinWidth="146"
                                        MinHeight="40"
+                                       HorizontalContentAlignment="Center"
                                        Appearance="Danger"
                                        Click="HandleConfirmClick"
                                        Content="Confirm and disable" />
                         </Grid>
                     </Grid>
                 </ScrollViewer>
-            </ui:CardControl>
+            </Border>
         </Grid>
     </Grid>
 </ui:FluentWindow>
