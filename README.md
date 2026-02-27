@@ -16,11 +16,11 @@
 
 Blocker enforces distraction-free work sessions by simultaneously:
 
-- 🔥 **Blocking executables via Windows Firewall** — outbound & inbound rules for Discord, Messenger, and Facebook desktop apps
-- 🌐 **Blocking domains via the hosts file** — redirects Discord, Facebook, and Messenger domains to `0.0.0.0`
-- 💀 **Killing & watching processes** — terminates target processes on enable and continuously prevents re-launch
-- 🛡️ **Guardian process** — a companion process that restarts Blocker if it gets killed during an active session
-- ⏱️ **Focus Lock** — a configurable cool-down period (default 30 min) that requires typing a confirmation phrase to disable early
+- **Blocking executables via Windows Firewall** — outbound & inbound rules for Discord, Messenger, and Facebook desktop apps
+- **Blocking domains via the hosts file** — redirects Discord, Facebook, and Messenger domains to `0.0.0.0`
+- **Killing & watching processes** — terminates target processes on enable and continuously prevents re-launch
+- **Guardian process** — a companion process that restarts Blocker if it gets killed during an active session
+- **Focus Lock** — a configurable cool-down period (default 30 min) that requires typing a confirmation phrase to disable early
 
 All changes are **fully reversible** — disabling blocking restores firewall rules, hosts file, and process state.
 
