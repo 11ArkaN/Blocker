@@ -1,6 +1,8 @@
 # Build artifacts
 **/bin/
 **/obj/
+artifacts/
+publish/
 
 # IDE
 .vs/
@@ -16,6 +18,7 @@ TestResults/
 *.log
 *.tmp
 *.cache
-/.dotnet/.dotnet
-/artifacts/build
 *.binlog
+
+# .NET tools
+.dotnet/

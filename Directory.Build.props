@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Authors>Blocker Contributors</Authors>
+    <Product>Blocker</Product>
+    <Description>A Windows desktop app that blocks distracting applications and websites at the system level.</Description>
+    <RepositoryUrl>https://github.com/11ArkaN/Blocker</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+</Project>
