@@ -55,7 +55,7 @@
                 </Grid.RowDefinitions>
 
                 <ui:CardControl Grid.Row="0"
-                                Header="Focus Dashboard"
+                                Header="{Binding Localization[Main.FocusDashboardHeader]}"
                                 BorderBrush="#34507B"
                                 Background="{DynamicResource AppHeroBrush}"
                                 Padding="18">
@@ -64,12 +64,12 @@
                                     Margin="0,0,16,10">
                             <TextBlock FontSize="28"
                                        FontWeight="SemiBold"
-                                       Text="Skupienie bez rozpraszaczy" />
+                                       Text="{Binding Localization[Main.HeroTitle]}" />
                             <TextBlock Margin="0,8,0,0"
                                        Foreground="#C8D8F3"
                                        FontSize="14"
                                        TextWrapping="Wrap"
-                                       Text="Discord i Messenger/Facebook sa blokowane na poziomie aplikacji i webu. Reszta systemu pozostaje dostepna." />
+                                       Text="{Binding Localization[Main.HeroDescription]}" />
                         </StackPanel>
                         <StackPanel VerticalAlignment="Center"
                                     Margin="0,0,0,6">
@@ -78,13 +78,26 @@
                                       Content="{Binding StatusBadgeText}" />
                             <ui:Badge Appearance="{Binding GuardianBadgeAppearance}"
                                       Content="{Binding GuardianStatus}" />
+                            <TextBlock Margin="0,12,0,4"
+                                       Foreground="{DynamicResource AppMutingTextBrush}"
+                                       Text="{Binding Localization[Main.LanguageLabel]}" />
+                            <ComboBox x:Name="LanguageComboBox"
+                                      SelectedValue="{Binding SelectedLanguageCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedValuePath="Tag"
+                                      SelectionChanged="HandleLanguageSelectionChanged"
+                                      MinWidth="150">
+                                <ComboBoxItem Tag="pl"
+                                              Content="{Binding Localization[Main.LanguagePolish]}" />
+                                <ComboBoxItem Tag="en"
+                                              Content="{Binding Localization[Main.LanguageEnglish]}" />
+                            </ComboBox>
                         </StackPanel>
                     </WrapPanel>
                 </ui:CardControl>
 
                 <StackPanel Grid.Row="1"
                             Margin="0,14,0,14">
-                    <ui:CardControl Header="Stan i sterowanie"
+                    <ui:CardControl Header="{Binding Localization[Main.StatusControlHeader]}"
                                     BorderBrush="{DynamicResource AppPanelBorderBrush}"
                                     Background="{DynamicResource AppPanelBrush}"
                                     Padding="14">
@@ -107,7 +120,7 @@
                                 <StackPanel MinWidth="150"
                                             Margin="0,0,10,10">
                                     <TextBlock Foreground="{DynamicResource AppMutingTextBrush}"
-                                               Text="Administrator" />
+                                               Text="{Binding Localization[Main.AdminLabel]}" />
                                     <ui:Badge Margin="0,6,0,0"
                                               Appearance="{Binding AdminBadgeAppearance}"
                                               Content="{Binding AdminStatus}" />
@@ -115,7 +128,7 @@
                                 <StackPanel MinWidth="150"
                                             Margin="0,0,10,10">
                                     <TextBlock Foreground="{DynamicResource AppMutingTextBrush}"
-                                               Text="Guardian" />
+                                               Text="{Binding Localization[Main.GuardianLabel]}" />
                                     <ui:Badge Margin="0,6,0,0"
                                               Appearance="{Binding GuardianBadgeAppearance}"
                                               Content="{Binding GuardianStatus}" />
@@ -123,7 +136,7 @@
                                 <StackPanel MinWidth="150"
                                             Margin="0,0,0,10">
                                     <TextBlock Foreground="{DynamicResource AppMutingTextBrush}"
-                                               Text="Tryb" />
+                                               Text="{Binding Localization[Main.ModeLabel]}" />
                                     <ui:Badge Margin="0,6,0,0"
                                               Appearance="{Binding ModeBadgeAppearance}"
                                               Content="{Binding StatusBadgeText}" />
@@ -160,27 +173,27 @@
                                                Appearance="Secondary"
                                                IsEnabled="{Binding CanInteract}"
                                                Command="{Binding RefreshCommand}"
-                                               Content="Odswiez status" />
+                                               Content="{Binding Localization[Main.RefreshStatus]}" />
                                 </StackPanel>
                             </WrapPanel>
                         </Grid>
                     </ui:CardControl>
 
                     <ui:CardControl Margin="0,12,0,0"
-                                    Header="Focus lock"
+                                    Header="{Binding Localization[Main.FocusLockHeader]}"
                                     BorderBrush="{DynamicResource AppPanelBorderBrush}"
                                     Background="{DynamicResource AppPanelBrush}"
                                     Padding="14">
                         <StackPanel>
                             <TextBlock Foreground="{DynamicResource AppMutingTextBrush}"
                                        TextWrapping="Wrap"
-                                       Text="W trakcie 30 minutowego locka, wylaczenie wymaga wpisania frazy potwierdzajacej." />
+                                       Text="{Binding Localization[Main.FocusLockDescription]}" />
                             <ui:InfoBar Margin="0,12,0,0"
                                         IsClosable="False"
                                         IsOpen="{Binding IsFocusPhraseRequired}"
                                         Severity="Warning"
-                                        Title="Fraza wymagana"
-                                        Message="Aby zakonczyc sesje przed czasem, wpisz fraze zabezpieczajaca." />
+                                        Title="{Binding Localization[Main.FocusPhraseRequiredTitle]}"
+                                        Message="{Binding Localization[Main.FocusPhraseRequiredMessage]}" />
                             <Border Margin="0,12,0,0"
                                     Padding="12"
                                     CornerRadius="10"
@@ -197,7 +210,7 @@
                 </StackPanel>
 
                 <ui:CardControl Grid.Row="2"
-                                Header="Dziennik zdarzen"
+                                Header="{Binding Localization[Main.EventLogHeader]}"
                                 BorderBrush="{DynamicResource AppPanelBorderBrush}"
                                 Background="{DynamicResource AppPanelBrush}"
                                 Padding="12">

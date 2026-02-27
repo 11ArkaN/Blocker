@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using Blocker.App.Contracts;
 using Forms = System.Windows.Forms;
 
 namespace Blocker.App.Services;
@@ -10,27 +11,30 @@ public sealed class TrayService : IDisposable
 
     private readonly Forms.NotifyIcon _notifyIcon;
     private readonly Forms.ContextMenuStrip _contextMenu;
+    private readonly ILocalizationService _localizationService;
     private readonly Forms.ToolStripMenuItem _openItem;
     private readonly Forms.ToolStripMenuItem _enableItem;
     private readonly Forms.ToolStripMenuItem _disableItem;
     private readonly Forms.ToolStripMenuItem _exitItem;
+    private bool _isBlockActive;
 
-    public TrayService()
+    public TrayService(ILocalizationService localizationService)
     {
+        _localizationService = localizationService;
         _openItem = CreateMenuItem(
-            "Pokaz okno",
+            string.Empty,
             (_, _) => OpenRequested?.Invoke(this, EventArgs.Empty),
             CreateIcon(TrayMenuIcon.Open));
         _enableItem = CreateMenuItem(
-            "Wlacz blokade",
+            string.Empty,
             (_, _) => EnableRequested?.Invoke(this, EventArgs.Empty),
             CreateIcon(TrayMenuIcon.Enable));
         _disableItem = CreateMenuItem(
-            "Wylacz blokade",
+            string.Empty,
             (_, _) => DisableRequested?.Invoke(this, EventArgs.Empty),
             CreateIcon(TrayMenuIcon.Disable));
         _exitItem = CreateMenuItem(
-            "Zamknij",
+            string.Empty,
             (_, _) => ExitRequested?.Invoke(this, EventArgs.Empty),
             CreateIcon(TrayMenuIcon.Exit));
 
@@ -62,6 +66,8 @@ public sealed class TrayService : IDisposable
         };
 
         _notifyIcon.DoubleClick += (_, _) => OpenRequested?.Invoke(this, EventArgs.Empty);
+        _localizationService.LanguageChanged += HandleLanguageChanged;
+        ApplyLocalization();
     }
 
     public event EventHandler? OpenRequested;
@@ -71,14 +77,16 @@ public sealed class TrayService : IDisposable
 
     public void SetBlockState(bool isActive)
     {
+        _isBlockActive = isActive;
         _enableItem.Enabled = !isActive;
         _disableItem.Enabled = isActive;
         _exitItem.Enabled = !isActive;
-        _notifyIcon.Text = isActive ? "Blocker (ON)" : "Blocker (OFF)";
+        _notifyIcon.Text = isActive ? _localizationService["Tray.StatusOn"] : _localizationService["Tray.StatusOff"];
     }
 
     public void Dispose()
     {
+        _localizationService.LanguageChanged -= HandleLanguageChanged;
         _notifyIcon.Visible = false;
         _notifyIcon.Dispose();
         _contextMenu.Dispose();
@@ -86,6 +94,20 @@ public sealed class TrayService : IDisposable
         DisposeMenuItem(_enableItem);
         DisposeMenuItem(_disableItem);
         DisposeMenuItem(_exitItem);
+    }
+
+    private void HandleLanguageChanged(object? sender, EventArgs e)
+    {
+        ApplyLocalization();
+    }
+
+    private void ApplyLocalization()
+    {
+        _openItem.Text = _localizationService["Tray.OpenWindow"];
+        _enableItem.Text = _localizationService["Tray.EnableBlock"];
+        _disableItem.Text = _localizationService["Tray.DisableBlock"];
+        _exitItem.Text = _localizationService["Tray.Exit"];
+        _notifyIcon.Text = _isBlockActive ? _localizationService["Tray.StatusOn"] : _localizationService["Tray.StatusOff"];
     }
 
     private static void DisposeMenuItem(Forms.ToolStripMenuItem item)

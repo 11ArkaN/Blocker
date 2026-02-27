@@ -16,3 +16,6 @@ TestResults/
 *.log
 *.tmp
 *.cache
+/.dotnet/.dotnet
+/artifacts/build
+*.binlog

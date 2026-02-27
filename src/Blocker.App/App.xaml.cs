@@ -11,6 +11,7 @@ namespace Blocker.App;
 public partial class App : System.Windows.Application
 {
     private ILogService? _logger;
+    private ILocalizationService? _localizationService;
     private IStateStore? _stateStore;
     private IBlockOrchestrator? _orchestrator;
     private IProcessWatchdog? _watchdog;
@@ -35,7 +36,7 @@ public partial class App : System.Windows.Application
         {
             _logger?.Error("Fatal startup exception.", ex);
             System.Windows.MessageBox.Show(
-                $"Nie udało się uruchomić aplikacji:{Environment.NewLine}{ex.Message}",
+                $"{T("App.StartupFailed")}{Environment.NewLine}{ex.Message}",
                 "Blocker",
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Error);
@@ -60,6 +61,8 @@ public partial class App : System.Windows.Application
     private async Task InitializeAsync(string[] args)
     {
         _logger = new FileLogService();
+        _localizationService = new LocalizationService(_logger);
+        await _localizationService.InitializeAsync();
         _stateStore = new JsonStateStore(_logger);
 
         var appExecutablePath = GetExecutablePath();
@@ -100,7 +103,7 @@ public partial class App : System.Windows.Application
             resumeActiveRuntime: resumeGuarded);
         await _stateStore.MarkSessionStartedAsync();
 
-        _viewModel = new MainWindowViewModel(_orchestrator, _logger);
+        _viewModel = new MainWindowViewModel(_orchestrator, _logger, _localizationService);
         await _viewModel.InitializeAsync();
         _viewModel.PropertyChanged += (_, eventArgs) =>
         {
@@ -110,8 +113,8 @@ public partial class App : System.Windows.Application
             }
         };
 
-        _mainWindow = new MainWindow(_viewModel);
-        _trayService = new TrayService();
+        _mainWindow = new MainWindow(_viewModel, _localizationService);
+        _trayService = new TrayService(_localizationService);
         WireTrayEvents();
         _trayService.SetBlockState(_viewModel.IsBlockActive);
 
@@ -213,7 +216,7 @@ public partial class App : System.Windows.Application
         if (isBlockActive)
         {
             System.Windows.MessageBox.Show(
-                "Najpierw wylacz blokade, aby zamknac aplikacje.",
+                T("App.DisableBeforeExit"),
                 "Blocker",
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Warning);
@@ -316,7 +319,7 @@ public partial class App : System.Windows.Application
         }
 
         System.Windows.MessageBox.Show(
-            $"Wystąpił nieoczekiwany błąd:{Environment.NewLine}{e.Exception.Message}",
+            $"{T("App.UnexpectedError")}{Environment.NewLine}{e.Exception.Message}",
             "Blocker",
             System.Windows.MessageBoxButton.OK,
             System.Windows.MessageBoxImage.Error);
@@ -334,6 +337,11 @@ public partial class App : System.Windows.Application
         {
             _logger?.Error("Unhandled background exception (non-Exception object).");
         }
+    }
+
+    private string T(string key)
+    {
+        return _localizationService is null ? key : _localizationService[key];
     }
 }
 

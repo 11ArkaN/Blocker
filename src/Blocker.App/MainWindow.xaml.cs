@@ -1,15 +1,22 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
+using Blocker.App.Contracts;
 using Blocker.App.ViewModels;
+using WpfComboBox = System.Windows.Controls.ComboBox;
+using WpfComboBoxItem = System.Windows.Controls.ComboBoxItem;
 
 namespace Blocker.App;
 
 public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 {
-    public MainWindow(MainWindowViewModel viewModel)
+    private readonly ILocalizationService _localizationService;
+
+    public MainWindow(MainWindowViewModel viewModel, ILocalizationService localizationService)
     {
         InitializeComponent();
         ViewModel = viewModel;
+        _localizationService = localizationService;
         DataContext = viewModel;
         viewModel.RequestSetupUnlockPhraseAsync = RequestSetupUnlockPhraseAsync;
         viewModel.RequestUnlockPhraseAsync = RequestUnlockPhraseAsync;
@@ -35,7 +42,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private Task<string?> RequestSetupUnlockPhraseAsync()
     {
-        var dialog = new UnlockPhraseWindow(UnlockPhraseWindowMode.Setup)
+        var dialog = new UnlockPhraseWindow(_localizationService, UnlockPhraseWindowMode.Setup)
         {
             Owner = this
         };
@@ -46,7 +53,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private Task<string?> RequestUnlockPhraseAsync(string? requiredPhrase)
     {
-        var dialog = new UnlockPhraseWindow(UnlockPhraseWindowMode.Verify, requiredPhrase)
+        var dialog = new UnlockPhraseWindow(_localizationService, UnlockPhraseWindowMode.Verify, requiredPhrase)
         {
             Owner = this
         };
@@ -61,6 +68,19 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         {
             Hide();
             WindowState = WindowState.Normal;
+        }
+    }
+
+    private void HandleLanguageSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is not WpfComboBox comboBox || comboBox.SelectedItem is not WpfComboBoxItem item)
+        {
+            return;
+        }
+
+        if (item.Tag is string languageCode && !string.IsNullOrWhiteSpace(languageCode))
+        {
+            ViewModel.SelectedLanguageCode = languageCode;
         }
     }
 }

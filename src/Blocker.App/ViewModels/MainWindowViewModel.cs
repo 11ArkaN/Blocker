@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -14,6 +15,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 {
     private readonly IBlockOrchestrator _orchestrator;
     private readonly ILogService _logger;
+    private readonly ILocalizationService _localization;
     private readonly RelayCommand _toggleCommand;
     private readonly RelayCommand _refreshCommand;
     private readonly DispatcherTimer _uptimeTimer;
@@ -21,23 +23,31 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     private bool _isBlockActive;
     private bool _isBusy;
     private bool _isFocusPhraseRequired;
+    private bool _isAdmin;
+    private bool _isGuardianHealthy;
     private DateTimeOffset? _activatedAtUtc;
     private DateTimeOffset? _focusLockUntilUtc;
-    private string _statusText = "Blokada jest wylaczona.";
-    private string _adminStatus = "NIE";
-    private string _guardianStatus = "NIEZNANY";
-    private string _activeSinceText = "Aktywna od: -";
-    private string _focusLockText = "Focus lock: -";
     private string? _unlockPhrase;
-    private string _unlockPhraseDisplay = "Fraza: -";
+    private string _activeSinceText;
+    private string _focusLockText;
+    private string _selectedLanguageCode;
+    private bool _isApplyingLanguageSelection;
+    private BlockState? _lastState;
 
-    public MainWindowViewModel(IBlockOrchestrator orchestrator, ILogService logger)
+    public MainWindowViewModel(IBlockOrchestrator orchestrator, ILogService logger, ILocalizationService localization)
     {
         _orchestrator = orchestrator;
         _logger = logger;
+        _localization = localization;
+
+        _selectedLanguageCode = localization.CurrentLanguageCode;
+        _activeSinceText = L("Main.ActiveSinceNone");
+        _focusLockText = L("Main.FocusLockNone");
 
         _toggleCommand = new RelayCommand(_ => _ = ToggleBlockAsync(), _ => !IsBusy);
         _refreshCommand = new RelayCommand(_ => _ = RefreshAsync(), _ => !IsBusy);
+
+        _localization.LanguageChanged += HandleLanguageChanged;
 
         _uptimeTimer = new DispatcherTimer
         {
@@ -60,8 +70,30 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
     public ICommand RefreshCommand => _refreshCommand;
 
+    public ILocalizationService Localization => _localization;
+
     public Func<string?, Task<string?>>? RequestUnlockPhraseAsync { get; set; }
     public Func<Task<string?>>? RequestSetupUnlockPhraseAsync { get; set; }
+
+    public string SelectedLanguageCode
+    {
+        get => _selectedLanguageCode;
+        set
+        {
+            if (string.Equals(_selectedLanguageCode, value, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            _selectedLanguageCode = value;
+            OnPropertyChanged();
+
+            if (!_isApplyingLanguageSelection)
+            {
+                _ = ApplyLanguageSelectionAsync(value);
+            }
+        }
+    }
 
     public bool IsBlockActive
     {
@@ -79,8 +111,10 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(ToggleButtonAppearance));
             OnPropertyChanged(nameof(StatusTitle));
             OnPropertyChanged(nameof(StatusBadgeText));
+            OnPropertyChanged(nameof(StatusText));
             OnPropertyChanged(nameof(StatusSeverity));
             OnPropertyChanged(nameof(ModeBadgeAppearance));
+            OnPropertyChanged(nameof(GuardianStatus));
             OnPropertyChanged(nameof(GuardianBadgeAppearance));
         }
     }
@@ -120,50 +154,20 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    public string StatusText
-    {
-        get => _statusText;
-        private set
-        {
-            if (_statusText == value)
-            {
-                return;
-            }
+    public string StatusText => IsBlockActive ? L("Main.StatusActive") : L("Main.StatusInactive");
 
-            _statusText = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public string AdminStatus
-    {
-        get => _adminStatus;
-        private set
-        {
-            if (_adminStatus == value)
-            {
-                return;
-            }
-
-            _adminStatus = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(AdminBadgeAppearance));
-        }
-    }
+    public string AdminStatus => _isAdmin ? L("Common.Yes") : L("Common.No");
 
     public string GuardianStatus
     {
-        get => _guardianStatus;
-        private set
+        get
         {
-            if (_guardianStatus == value)
+            if (!IsBlockActive)
             {
-                return;
+                return L("Main.NotApplicable");
             }
 
-            _guardianStatus = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(GuardianBadgeAppearance));
+            return _isGuardianHealthy ? L("Main.GuardianActive") : L("Main.GuardianUnavailable");
         }
     }
 
@@ -199,24 +203,18 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
     public string UnlockPhraseDisplay
     {
-        get => _unlockPhraseDisplay;
-        private set
+        get
         {
-            if (_unlockPhraseDisplay == value)
-            {
-                return;
-            }
-
-            _unlockPhraseDisplay = value;
-            OnPropertyChanged();
+            var label = L("Main.PhraseLabel");
+            return string.IsNullOrWhiteSpace(_unlockPhrase) ? $"{label} -" : $"{label} {_unlockPhrase}";
         }
     }
 
-    public string ToggleButtonText => IsBlockActive ? "Wylacz blokade" : "Wlacz blokade";
+    public string ToggleButtonText => IsBlockActive ? L("Main.ToggleOff") : L("Main.ToggleOn");
 
-    public string StatusTitle => IsBlockActive ? "Blokada aktywna" : "Blokada nieaktywna";
+    public string StatusTitle => IsBlockActive ? L("Main.StatusTitleActive") : L("Main.StatusTitleInactive");
 
-    public string StatusBadgeText => IsBlockActive ? "TRYB: ON" : "TRYB: OFF";
+    public string StatusBadgeText => IsBlockActive ? L("Main.StatusBadgeOn") : L("Main.StatusBadgeOff");
 
     public ControlAppearance ToggleButtonAppearance => IsBlockActive ? ControlAppearance.Danger : ControlAppearance.Success;
 
@@ -224,7 +222,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
     public ControlAppearance ModeBadgeAppearance => IsBlockActive ? ControlAppearance.Success : ControlAppearance.Secondary;
 
-    public ControlAppearance AdminBadgeAppearance => AdminStatus == "TAK" ? ControlAppearance.Success : ControlAppearance.Danger;
+    public ControlAppearance AdminBadgeAppearance => _isAdmin ? ControlAppearance.Success : ControlAppearance.Danger;
 
     public ControlAppearance GuardianBadgeAppearance
     {
@@ -235,7 +233,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
                 return ControlAppearance.Secondary;
             }
 
-            return GuardianStatus == "AKTYWNY" ? ControlAppearance.Success : ControlAppearance.Danger;
+            return _isGuardianHealthy ? ControlAppearance.Success : ControlAppearance.Danger;
         }
     }
 
@@ -273,7 +271,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     public async Task InitializeAsync()
     {
         await RefreshAsync();
-        AddLog("Aplikacja uruchomiona.");
+        AddLog(L("Main.LogAppStarted"));
     }
 
     public async Task EnableBlockAsync()
@@ -309,7 +307,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     private async Task SetBlockStateAsync(bool enable)
     {
         IsBusy = true;
-        AddLog(enable ? "Wlaczanie blokady..." : "Wylaczanie blokady...");
+        AddLog(enable ? L("Main.LogEnabling") : L("Main.LogDisabling"));
 
         try
         {
@@ -318,14 +316,14 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             {
                 if (RequestSetupUnlockPhraseAsync is null)
                 {
-                    AddLog("Brak okna konfiguracji frazy. Nie mozna wlaczyc blokady.");
+                    AddLog(L("Main.LogNoSetupDialog"));
                     return;
                 }
 
                 var newPhrase = await RequestSetupUnlockPhraseAsync();
                 if (newPhrase is null)
                 {
-                    AddLog("Wlaczenie anulowane.");
+                    AddLog(L("Main.LogEnableCancelled"));
                     return;
                 }
 
@@ -339,7 +337,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
                     phrase = await RequestUnlockPhraseAsync(_unlockPhrase);
                     if (phrase is null)
                     {
-                        AddLog("Wylaczenie anulowane.");
+                        AddLog(L("Main.LogDisableCancelled"));
                         return;
                     }
                 }
@@ -354,17 +352,17 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
             foreach (var error in result.Errors)
             {
-                AddLog($"Blad: {error}");
+                AddLog($"{L("Main.LogErrorPrefix")} {error}");
             }
 
             if (!result.Success)
             {
-                AddLog("Operacja zakonczona z bledami.");
+                AddLog(L("Main.LogOperationWithErrors"));
             }
         }
         catch (Exception ex)
         {
-            AddLog($"Wyjatek: {ex.Message}");
+            AddLog($"{L("Main.LogExceptionPrefix")} {ex.Message}");
             _logger.Error("Unexpected error during toggle operation.", ex);
         }
         finally
@@ -383,25 +381,28 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            AddLog($"Nie udalo sie odswiezyc statusu: {ex.Message}");
+            AddLog($"{L("Main.LogRefreshFailedPrefix")} {ex.Message}");
             _logger.Error("Refresh failed.", ex);
         }
     }
 
     private void ApplyState(BlockState state)
     {
+        _lastState = state;
         IsBlockActive = state.IsActive;
         _activatedAtUtc = state.ActivatedAt;
         _focusLockUntilUtc = state.FocusLockUntil;
         _unlockPhrase = state.UnlockPhrase;
+        _isAdmin = state.IsAdmin;
+        _isGuardianHealthy = state.IsGuardianHealthy;
         IsFocusPhraseRequired = state.IsFocusUnlockPhraseRequired;
-        UnlockPhraseDisplay = !string.IsNullOrWhiteSpace(_unlockPhrase) ? $"Fraza: {_unlockPhrase}" : "Fraza: -";
 
-        StatusText = state.IsActive
-            ? "Discord i Messenger/Facebook sa blokowane."
-            : "Ograniczenia sa wylaczone.";
-        AdminStatus = state.IsAdmin ? "TAK" : "NIE";
-        GuardianStatus = state.IsActive ? (state.IsGuardianHealthy ? "AKTYWNY" : "NIEDOSTEPNY") : "NIE DOTYCZY";
+        OnPropertyChanged(nameof(StatusText));
+        OnPropertyChanged(nameof(AdminStatus));
+        OnPropertyChanged(nameof(AdminBadgeAppearance));
+        OnPropertyChanged(nameof(GuardianStatus));
+        OnPropertyChanged(nameof(GuardianBadgeAppearance));
+        OnPropertyChanged(nameof(UnlockPhraseDisplay));
 
         UpdateActiveSinceText();
         UpdateFocusLockText();
@@ -412,31 +413,39 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     {
         if (!IsBlockActive || _activatedAtUtc is null)
         {
-            ActiveSinceText = "Aktywna od: -";
+            ActiveSinceText = L("Main.ActiveSinceNone");
             return;
         }
 
         var localActivated = _activatedAtUtc.Value.ToLocalTime();
         var elapsed = DateTimeOffset.Now - localActivated;
-        ActiveSinceText = $"Aktywna od: {localActivated:yyyy-MM-dd HH:mm:ss} ({elapsed:hh\\:mm\\:ss})";
+        ActiveSinceText = string.Format(
+            CultureInfo.CurrentCulture,
+            L("Main.ActiveSinceFormat"),
+            localActivated,
+            elapsed);
     }
 
     private void UpdateFocusLockText()
     {
         if (!IsBlockActive || _focusLockUntilUtc is null)
         {
-            FocusLockText = "Focus lock: -";
+            FocusLockText = L("Main.FocusLockNone");
             return;
         }
 
         var remaining = _focusLockUntilUtc.Value - DateTimeOffset.UtcNow;
         if (remaining <= TimeSpan.Zero)
         {
-            FocusLockText = "Focus lock wygasl. Mozesz wylaczyc blokade bez frazy.";
+            FocusLockText = L("Main.FocusLockExpired");
             return;
         }
 
-        FocusLockText = $"Pozostalo: {remaining:mm\\:ss} | fraza wymagana: {(IsFocusPhraseRequired ? "TAK" : "NIE")}";
+        FocusLockText = string.Format(
+            CultureInfo.CurrentCulture,
+            L("Main.FocusLockRemainingFormat"),
+            remaining,
+            IsFocusPhraseRequired ? L("Common.Yes") : L("Common.No"));
     }
 
     private void AddLog(string message)
@@ -447,6 +456,49 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         {
             ActivityLog.RemoveAt(ActivityLog.Count - 1);
         }
+    }
+
+    private async Task ApplyLanguageSelectionAsync(string languageCode)
+    {
+        try
+        {
+            await _localization.SetLanguageAsync(languageCode);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error("Failed to change app language.", ex);
+        }
+    }
+
+    private void HandleLanguageChanged(object? sender, EventArgs e)
+    {
+        _isApplyingLanguageSelection = true;
+        SelectedLanguageCode = _localization.CurrentLanguageCode;
+        _isApplyingLanguageSelection = false;
+
+        OnPropertyChanged(nameof(ToggleButtonText));
+        OnPropertyChanged(nameof(StatusTitle));
+        OnPropertyChanged(nameof(StatusBadgeText));
+        OnPropertyChanged(nameof(StatusText));
+        OnPropertyChanged(nameof(AdminStatus));
+        OnPropertyChanged(nameof(GuardianStatus));
+        OnPropertyChanged(nameof(UnlockPhraseDisplay));
+        OnPropertyChanged(nameof(Localization));
+
+        if (_lastState is not null)
+        {
+            ApplyState(_lastState);
+        }
+        else
+        {
+            UpdateActiveSinceText();
+            UpdateFocusLockText();
+        }
+    }
+
+    private string L(string key)
+    {
+        return _localization[key];
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
