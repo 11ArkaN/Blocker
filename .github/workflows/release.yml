@@ -28,7 +28,16 @@ jobs:
           --configuration Release
           --output publish/framework-dependent
 
-      - name: Publish (self-contained)
+      - name: Publish Guardian (self-contained)
+        run: >
+          dotnet publish src/Blocker.Guardian/Blocker.Guardian.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          --output publish/self-contained
+
+      - name: Publish App (self-contained)
         run: >
           dotnet publish src/Blocker.App/Blocker.App.csproj
           --configuration Release
